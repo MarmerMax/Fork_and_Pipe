@@ -15,7 +15,6 @@ char buf1[32]; //father buffer
 char buf2[32]; //child buffer
 char answer[32];    //answer array
 char completed[1]; //success buffer
-// int stop = 0;  //stop loop
 int result = 0; //success coded
 
 
@@ -36,7 +35,6 @@ int check_length(char * str){
 }
 
 void signal_handler(int sig){
-     // printf("\n");
      result = check_length(answer); // the result was success
      signal(sig, SIG_IGN); //ignore the sigint
 }
@@ -44,14 +42,9 @@ void signal_handler(int sig){
 // int main(int argc, char **argv){
 int main(){
 
-     // if (argc < 2) {
-     //      printf("usage: %s 'string'\n", argv[0]);
-     //      return 1;
-     // }
-
      char msg[21];
      int len = 0;
-     printf(">>> ");
+     printf("plain test: ");
      while(scanf("%[^\n]s", msg) != EOF){
           len = strlen(msg);
           if(len > 20){
@@ -62,13 +55,6 @@ int main(){
                break;
           }
      }
-
-     
-     // size_t len = strlen(msg);
-     // if(len > 20){
-     //      printf("Fail: Input string is too long...\n");
-     //      exit(1);
-     // }
 
      int mypipe1[2]; //define pipe1 - send to child input string
      int mypipe2[2]; //define pipe2 - send to father coded input string
@@ -91,14 +77,12 @@ int main(){
 
           close(mypipe1[0]);// Close reading end of first pipe 
           write(mypipe1[1], msg, len); //write to child
-          // printf("Parent send the message...\n");
           close(mypipe1[1]); //close writing end of first pipe
 
           wait(NULL);// Wait for child to send a string 
 
           close(mypipe2[1]);// Close writing end of second pipe 
           read(mypipe2[0], buf1, 32);  
-          // printf("Parent get the message...\n");
           close(mypipe2[0]);
 
           close(mypipe3[1]);
@@ -109,7 +93,7 @@ int main(){
           // Read string from child, print it and close 
           // reading end. 
           if(completed[0] == '1'){
-               printf("Encoded: ");
+               printf("encrypted by process %d : ", getpid());
                for(int i = 0; i < 32; i++){
                     printf("%c", buf1[i]);
                }
@@ -124,23 +108,13 @@ int main(){
           signal(SIGINT, signal_handler);
           close(mypipe1[1]);// Close writing end of first pipe 
           read(mypipe1[0], buf2, len); //read from father
-          // printf("Child got the message...\n");
           close(mypipe1[0]); 
           close(mypipe2[0]); 
 
           md5(buf2, len, answer); //do md5 and put result to answer
-          // printf("Child coded the message...\n");
-
-          // printf("size of answer %d\n", sizeof(answer));
 
           write(mypipe2[1], answer, sizeof(answer));
           close(mypipe2[1]);
-          // printf("Child send the message back...\n");
-
-          // printf("\n");
-          // printf("If you want to check that string was coded push Ctrl+c ... \n");
-          // while(!stop){}//wait for signal ctrl+c   
-
 
           kill(getpid(), SIGINT);
 
