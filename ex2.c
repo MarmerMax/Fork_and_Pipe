@@ -41,19 +41,34 @@ void signal_handler(int sig){
      signal(sig, SIG_IGN); //ignore the sigint
 }
 
-int main(int argc, char **argv){
+// int main(int argc, char **argv){
+int main(){
 
-     if (argc < 2) {
-          printf("usage: %s 'string'\n", argv[0]);
-          return 1;
+     // if (argc < 2) {
+     //      printf("usage: %s 'string'\n", argv[0]);
+     //      return 1;
+     // }
+
+     char msg[21];
+     int len = 0;
+     printf(">>> ");
+     while(scanf("%[^\n]s", msg) != EOF){
+          len = strlen(msg);
+          if(len > 20){
+               printf("FATAL: Input longer than 20...\n");
+               exit(1);
+          }
+          else{
+               break;
+          }
      }
 
-     char *msg = argv[1];
-     size_t len = strlen(msg);
-     if(len > 20){
-          printf("Fail: Input string is too long...\n");
-          exit(1);
-     }
+     
+     // size_t len = strlen(msg);
+     // if(len > 20){
+     //      printf("Fail: Input string is too long...\n");
+     //      exit(1);
+     // }
 
      int mypipe1[2]; //define pipe1 - send to child input string
      int mypipe2[2]; //define pipe2 - send to father coded input string
@@ -94,6 +109,7 @@ int main(int argc, char **argv){
           // Read string from child, print it and close 
           // reading end. 
           if(completed[0] == '1'){
+               printf("Encoded: ");
                for(int i = 0; i < 32; i++){
                     printf("%c", buf1[i]);
                }
@@ -101,7 +117,7 @@ int main(int argc, char **argv){
                kill(pid, SIGINT);
           }
           else{
-               printf("Coding failed...\n");
+               printf("Encoding failed...\n");
           }
      }
      else{ 
