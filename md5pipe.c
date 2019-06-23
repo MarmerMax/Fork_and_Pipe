@@ -44,7 +44,7 @@ int main(){
 
      char msg[21];
      int len = 0;
-     printf("plain test: ");
+     printf("plain text: ");
      while(scanf("%[^\n]s", msg) != EOF){
           len = strlen(msg);
           if(len > 20){
